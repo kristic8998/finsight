@@ -46,8 +46,9 @@ class MisOutput:
 class MisGenerator:
     """Builds the report pack from an ExecutiveService."""
 
-    def __init__(self, executive: ExecutiveService) -> None:
+    def __init__(self, executive: ExecutiveService, company_name: str = "") -> None:
         self._executive = executive
+        self._company = company_name.strip()
 
     def generate(
         self,
@@ -161,7 +162,10 @@ class MisGenerator:
             trend.to_excel(writer, sheet_name="Trend Data", index=False)
 
             summary = writer.sheets["Summary"]
-            summary["A1"] = f"{period.title()} MIS — {today.isoformat()}"
+            title_line = f"{period.title()} MIS — {today.isoformat()}"
+            if self._company:
+                title_line = f"{self._company} · {title_line}"
+            summary["A1"] = title_line
             summary["A1"].font = _TITLE_FONT
             summary["A2"] = brief.summary_text
             summary["A2"].alignment = Alignment(wrap_text=True)
@@ -216,6 +220,7 @@ class MisGenerator:
             for i in brief.insights
         )
         branch_table = brief.branches.to_html(index=False, border=0)
+        company_prefix = f"{self._company} · " if self._company else ""
         html = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>{period.title()} MIS {today.isoformat()}</title><style>
 body{{font-family:Segoe UI,Arial,sans-serif;margin:24px;color:#1c2733;background:#f6f8fb}}
@@ -230,7 +235,7 @@ table{{border-collapse:collapse;background:#fff;box-shadow:0 1px 4px #0002;borde
 th{{background:#1F4E79;color:#fff;padding:7px 12px;text-align:left;font-size:13px}}
 td{{padding:6px 12px;border-bottom:1px solid #e8edf3;font-size:13px}}
 @media print{{body{{background:#fff}}}}</style></head><body>
-<h1>{period.title()} MIS — {today.isoformat()}</h1>
+<h1>{company_prefix}{period.title()} MIS — {today.isoformat()}</h1>
 <div class="sub">{brief.summary_text}</div>
 <div class="cards">{card_html}</div>
 <h2>Executive insights</h2>{insight_html}
