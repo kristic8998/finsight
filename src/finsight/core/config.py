@@ -46,6 +46,12 @@ class EmailConfig(BaseModel):
     # Password is stored via the credential vault, never in YAML.
 
 
+class BrandingConfig(BaseModel):
+    """Company identity stamped onto generated report packs."""
+
+    company_name: str = ""
+
+
 class DemoConfig(BaseModel):
     seed: int = 42
     branches: int = Field(default=8, ge=2, le=50)
@@ -58,6 +64,7 @@ class AppConfig(BaseModel):
     recon: ReconConfig = Field(default_factory=ReconConfig)
     automation: AutomationConfig = Field(default_factory=AutomationConfig)
     email: EmailConfig = Field(default_factory=EmailConfig)
+    branding: BrandingConfig = Field(default_factory=BrandingConfig)
     demo: DemoConfig = Field(default_factory=DemoConfig)
 
 
