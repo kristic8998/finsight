@@ -19,6 +19,7 @@ from ..modules.analytics import AnalyticsService
 from ..modules.automation import AutomationCenter
 from ..modules.executive import ExecutiveService
 from ..modules.mis import MisGenerator
+from ..modules.mis_catalog import MisCatalog
 from ..modules.nlq import NlqEngine
 from ..modules.productivity import ProductivityService
 from ..modules.sql_studio import SqlStudioService
@@ -36,6 +37,7 @@ class AppContext:
     analytics: AnalyticsService
     nlq: NlqEngine
     mis: MisGenerator
+    mis_catalog: MisCatalog
     sql: SqlStudioService
     automation: AutomationCenter
     productivity: ProductivityService
@@ -49,7 +51,8 @@ class AppContext:
         self.executive = ExecutiveService(self.data, self.config.executive)
         self.analytics = AnalyticsService(self.data)
         self.nlq = NlqEngine(self.data)
-        self.mis = MisGenerator(self.executive)
+        self.mis = MisGenerator(self.executive, self.config.branding.company_name)
+        self.mis_catalog = MisCatalog(self.data, self.appdb, self.config.branding.company_name)
 
 
 def build_context(config: AppConfig) -> AppContext:
@@ -62,7 +65,8 @@ def build_context(config: AppConfig) -> AppContext:
     executive = ExecutiveService(data, config.executive)
     analytics = AnalyticsService(data)
     nlq = NlqEngine(data)
-    mis = MisGenerator(executive)
+    mis = MisGenerator(executive, config.branding.company_name)
+    mis_catalog = MisCatalog(data, appdb, config.branding.company_name)
     sql = SqlStudioService(connections, appdb)
     automation = AutomationCenter(appdb, poll_seconds=config.automation.poll_seconds)
     productivity = ProductivityService(appdb)
@@ -77,6 +81,7 @@ def build_context(config: AppConfig) -> AppContext:
         analytics=analytics,
         nlq=nlq,
         mis=mis,
+        mis_catalog=mis_catalog,
         sql=sql,
         automation=automation,
         productivity=productivity,
