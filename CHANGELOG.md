@@ -2,6 +2,15 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-07-24
+
+### Added
+- **Business MIS catalog**: six named one-click reports — Collections MIS, Disbursement MIS, Recovery & Overdue MIS, Branch MIS, Employee MIS, Product MIS — each a styled multi-sheet workbook (or per-section CSV) built from the same read-model as the dashboard
+- **Custom report templates**: compose your own MIS from 13 named sections, save it, regenerate daily; templates persist in the app database
+- **CSV export format** for catalog reports
+- **Company branding**: Settings → Branding stamps your company name on every report pack
+- **Recent reports** list on the MIS page (double-click to open) and configurable report window (days)
+
 ## [1.0.0] — 2026-07-24
 
 ### Added

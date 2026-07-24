@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "finsight"
-version = "1.0.0"
+version = "1.1.0"
 description = "Enterprise lending analytics, automation & executive intelligence desktop suite for NBFC/FinTech teams."
 readme = "README.md"
 requires-python = ">=3.10"
