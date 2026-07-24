@@ -46,6 +46,20 @@ class SettingsPage(ctk.CTkFrame):
         self._start.set(config.ui.start_page)
         self._start.pack(side="left")
 
+        # ---- branding -----------------------------------------------------
+        branding = Section(scroll, "Branding (stamped on every report pack)")
+        branding.pack(fill="x", pady=4)
+        brand_row = ctk.CTkFrame(branding.body, fg_color="transparent")
+        brand_row.pack(fill="x")
+        ctk.CTkLabel(brand_row, text="Company name").pack(side="left", padx=(0, 8))
+        self._company = ctk.CTkEntry(brand_row, width=320)
+        if config.branding.company_name:
+            self._company.insert(0, config.branding.company_name)
+        self._company.pack(side="left")
+        ctk.CTkButton(brand_row, text="💾 Save", width=80, command=self._save_branding).pack(
+            side="left", padx=8
+        )
+
         # ---- alert thresholds ------------------------------------------------
         thresholds = Section(scroll, "Executive alert thresholds")
         thresholds.pack(fill="x", pady=4)
@@ -182,6 +196,13 @@ class SettingsPage(ctk.CTkFrame):
         self.ctx.config.ui.start_page = value
         save_config(self.ctx.config)
         self.app.toast.show(f"Start page set to {value}", "ok")
+
+    def _save_branding(self) -> None:
+        self.ctx.config.branding.company_name = self._company.get().strip()
+        save_config(self.ctx.config)
+        # Rebuild report generators so the new name applies immediately.
+        self.ctx.use_connection(self.ctx.active_connection)
+        self.app.toast.show("Branding saved — new reports will carry it", "ok")
 
     def _save_thresholds(self) -> None:
         try:
