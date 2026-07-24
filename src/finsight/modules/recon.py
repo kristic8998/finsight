@@ -180,6 +180,15 @@ def export_recon_report(result: ReconResult, path: Path | str) -> Path:
         "Duplicates Left": "6A1B9A",
         "Duplicates Right": "6A1B9A",
     }
+    from .investigate import investigate
+
+    inv = investigate(result)
+    sheets["Investigation"] = inv.to_frame()
+    colors["Investigation"] = "1F4E79"
+    if len(inv.typo_pairs):
+        sheets["Possible Typos"] = inv.typo_pairs
+        colors["Possible Typos"] = "EF6C00"
+
     with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
         for sheet_name, frame in sheets.items():
             frame.to_excel(writer, sheet_name=sheet_name, index=False)
