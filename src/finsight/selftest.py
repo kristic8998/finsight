@@ -28,7 +28,9 @@ def run_selftest() -> int:
 
     from .data.demo_data import generate_demo_db
 
-    with tempfile.TemporaryDirectory(prefix="finsight-selftest-") as tmp:
+    with tempfile.TemporaryDirectory(
+        prefix="finsight-selftest-", ignore_cleanup_errors=True
+    ) as tmp:
         tmp_path = Path(tmp)
         demo = generate_demo_db(config.demo, path=tmp_path / "demo.db", force=True)
 
@@ -116,6 +118,9 @@ def run_selftest() -> int:
             if failures == 0
             else f"{failures} check(s) FAILED — see traceback above."
         )
+        # Release every handle before the temp dir is removed — on Windows
+        # an open SQLite file cannot be deleted (caught by CI on windows-latest).
+        context.connections.dispose_all()
         context.runner.shutdown()
         context.appdb.close()
         return 0 if failures == 0 else 1

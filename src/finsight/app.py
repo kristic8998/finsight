@@ -237,6 +237,7 @@ class FinSightApp(ctk.CTk):
         try:
             self.context.automation.stop()
             self.context.runner.shutdown()
+            self.context.connections.dispose_all()
             create_backup()
         except Exception as exc:  # closing must never hang the window
             logger.warning("shutdown housekeeping failed: %s", exc)
