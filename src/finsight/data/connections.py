@@ -113,6 +113,13 @@ class ConnectionManager:
         self._engines[name] = engine
         return engine
 
+    def dispose_all(self) -> None:
+        """Close every cached engine (required on Windows before deleting
+        SQLite files — open handles block deletion there)."""
+        for engine in self._engines.values():
+            engine.dispose()
+        self._engines.clear()
+
     def test(self, name: str) -> tuple[bool, str]:
         """Cheap connectivity probe; returns (ok, message)."""
         try:
