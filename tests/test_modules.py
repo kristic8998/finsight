@@ -60,7 +60,8 @@ class TestRecon:
         path = export_recon_report(result, tmp_path / "recon.xlsx")
         sheets = pd.read_excel(path, sheet_name=None)
         assert "Summary" in sheets and "Amount Mismatch" in sheets
-        assert len(sheets) == 7
+        assert "Investigation" in sheets  # root-cause sheet added in v1.2
+        assert len(sheets) >= 8
 
 
 class TestExcelTools:
