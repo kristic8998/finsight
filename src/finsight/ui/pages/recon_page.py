@@ -87,6 +87,16 @@ class ReconPage(ctk.CTkFrame):
             actions, text="", anchor="w", font=ctk.CTkFont(size=12, weight="bold")
         )
         self._summary.pack(side="left", padx=12)
+        self._narrative = ctk.CTkLabel(
+            self,
+            text="",
+            anchor="w",
+            justify="left",
+            wraplength=1150,
+            font=ctk.CTkFont(size=11),
+            text_color=("gray30", "gray70"),
+        )
+        self._narrative.pack(fill="x", pady=(4, 0))
 
         self._tabs = ctk.CTkTabview(self)
         self._tabs.pack(fill="both", expand=True, pady=(8, 0))
@@ -154,7 +164,11 @@ class ReconPage(ctk.CTkFrame):
 
     def _render(self, result: ReconResult) -> None:
         self._result = result
+        from ...modules.investigate import investigate
+
+        inv = investigate(result)
         self._summary.configure(text=result.summary)
+        self._status_narrative(inv.narrative)
         self._grids["Mismatches"].show(result.amount_mismatch)
         self._grids["Only Left"].show(result.only_left)
         self._grids["Only Right"].show(result.only_right)
@@ -175,6 +189,10 @@ class ReconPage(ctk.CTkFrame):
         self._grids["Duplicates"].show(duplicates)
         self._tabs.set("Mismatches")
         self.app.toast.show("Reconciliation complete", "ok")
+
+    def _status_narrative(self, text: str) -> None:
+        """Show the root-cause narrative under the summary line."""
+        self._narrative.configure(text=text)
 
     def export(self) -> None:
         if self._result is None:

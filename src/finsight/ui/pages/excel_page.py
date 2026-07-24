@@ -153,13 +153,25 @@ class ExcelPage(ctk.CTkFrame):
         path = self._pick("Choose the file to profile")
         if not path:
             return
-        run_in_thread(
-            self,
-            self.ctx.runner.submit,
-            lambda: xt.profile(xt.read_table(path)),
-            lambda f: (self._grid.show(f), self._done(f"Profile of {Path(path).name}")),
-            self._failed,
-        )
+
+        def work():
+            from ...modules.investigate import quality_score
+
+            frame = xt.read_table(path)
+            return xt.profile(frame), quality_score(frame)
+
+        def done(payload) -> None:  # noqa: ANN001
+            prof, score = payload
+            self._grid.show(prof)
+            notes = ("; ".join(score.notes)) if score.notes else "no issues found"
+            self._done(
+                f"Profile of {Path(path).name} — Data Quality Score "
+                f"{score.overall:.0f}/100 (grade {score.grade}): completeness "
+                f"{score.completeness:.0f}, uniqueness {score.uniqueness:.0f}, "
+                f"consistency {score.consistency:.0f}. {notes}"
+            )
+
+        run_in_thread(self, self.ctx.runner.submit, work, done, self._failed)
 
     def compare(self) -> None:
         left = self._pick("Choose the FIRST file")
