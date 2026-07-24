@@ -2,6 +2,22 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [1.3.0] — 2026-07-24
+
+Windows distribution & documentation release — nothing changes in the app's behaviour; everything changes in how you install and hand it off.
+
+### Added
+- **Inno Setup installer** (`installer/finsight.iss`): per-user install (no admin), Start-menu + optional desktop shortcuts, in-place upgrades via a fixed `AppId`, and an auto-generated uninstaller registered in *Apps & features*
+- **Portable build** (`scripts/build_portable.bat`): produces a self-contained `FinSight-1.3.0-portable.zip` with a `Start FinSight.bat` launcher and a plain-language read-me — no install, no admin, no Python on the target PC
+- **Hardened build script** (`scripts/build_windows.bat`): auto-creates the venv, installs dev extras, runs the self-test as a pre-flight, then freezes a clean one-folder PyInstaller build
+- **[docs/INSTALL.md](docs/INSTALL.md)**: end-to-end Windows guide — Python version, venv, dependencies, configuration, PyInstaller build, portable + installer packaging, installing on a **no-Python** machine, updating after future releases, and uninstalling (with data-removal notes)
+- **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)**: fast, task-oriented guide to the nine areas, shortcuts, and connecting your own data
+- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)**: SmartScreen, antivirus false positives, missing VC++ runtime, hidden-import build errors, high-DPI issues, and log collection
+
+### Notes
+- The installer/exe are not code-signed, so Windows SmartScreen shows a first-run prompt (documented). Code-signing needs a purchased certificate and is on the roadmap.
+- Because PyInstaller cannot cross-compile, the `.exe`/`Setup.exe` artifacts must be built and smoke-tested on a Windows machine; the scripts and installer script are validated in the repo, and CI continues to verify the code on Windows + Ubuntu across Python 3.10–3.12.
+
 ## [1.2.0] — 2026-07-24
 
 ### Added

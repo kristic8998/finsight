@@ -25,7 +25,16 @@ Open it and everything already works: FinSight ships a realistic synthetic lendi
 | **Productivity** | Notes, kanban task board, pinned favourites |
 | **Platform** | Dark/light themes, **Ctrl+K command palette**, global search, keyboard shortcuts, auto-backup on exit, secure credential vault (Windows Credential Manager) |
 
-## Quickstart (Windows, 5 minutes)
+## Install it (no Python required)
+
+Most people want the packaged app, not the source. Grab it from the [Releases page](https://github.com/kristic8998/finsight/releases):
+
+- **Installer** — `FinSight-Setup-1.3.0.exe`: run the wizard, get Start-menu shortcuts, per-user (no admin).
+- **Portable** — `FinSight-1.3.0-portable.zip`: unzip anywhere and run `Start FinSight.bat`.
+
+Both bundle their own Python, so the target PC needs nothing but Windows 10/11 64-bit. Full walkthrough — including building the exe, the Inno Setup installer, updating, and uninstalling — is in **[docs/INSTALL.md](docs/INSTALL.md)**.
+
+## Quickstart from source (Windows, 5 minutes)
 
 ```bat
 git clone https://github.com/kristic8998/finsight
@@ -36,6 +45,14 @@ finsight                        :: launches the app
 ```
 
 No configuration needed — the demo lending database is generated on first launch. Your data lives in `%LOCALAPPDATA%\FinSight` (settings, history, reports, automatic backups).
+
+### Build the distributables
+
+```bat
+scripts\build_windows.bat        :: PyInstaller one-folder build -> dist\FinSight\
+scripts\build_portable.bat       :: -> dist\FinSight-1.3.0-portable.zip
+:: then compile installer\finsight.iss in Inno Setup -> FinSight-Setup-1.3.0.exe
+```
 
 ### Connecting your real database (Azure SQL / MS SQL)
 
@@ -81,21 +98,27 @@ finsight/
 │   ├── app.py       # composition root + window shell
 │   └── selftest.py  # `finsight --selftest` end-to-end verification
 ├── tests/           # 62 tests over every service
-├── docs/            # architecture, user manual, developer guide
+├── docs/            # install, user guide, troubleshooting, manual, architecture, dev guide
 ├── sample_data/     # recon + cleaning demo files
-├── scripts/         # Windows install/run/build (PyInstaller) scripts
+├── scripts/         # Windows install/run + PyInstaller & portable-zip build scripts
+├── installer/       # Inno Setup script (finsight.iss) -> Setup.exe
 └── .github/workflows/ci.yml
 ```
 
 ## Documentation
 
+- **[Install Guide](docs/INSTALL.md)** — installer & portable, building from source, PyInstaller, Inno Setup installer, installing on a no-Python PC, updating, uninstalling
+- **[User Guide](docs/USER_GUIDE.md)** — get productive fast; the nine areas, shortcuts, connecting your data
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** — SmartScreen, antivirus, missing DLLs, build issues, logs
 - **[User Manual](docs/USER_MANUAL.md)** — every module, step by step, written for a non-programmer
 - **[Architecture](docs/ARCHITECTURE.md)** — layers, patterns (repository, service, DI), threading model, canonical schema
 - **[Developer Guide](docs/DEVELOPER_GUIDE.md)** — dev setup, adding a module, adding an automation job, building the .exe
 
 ## Roadmap (deliberately deferred, with reasons)
 
-Power BI REST integration (needs Azure AD app registration in your tenant), SQL Server execution-plan viewer (SSMS does this better today), packaged installer via PyInstaller (spec file ships; build on a Windows machine with `scripts\build_windows.bat`), configurable dashboard widget layout, and per-SKU schema mapping UI for non-canonical warehouses.
+Power BI REST integration (needs Azure AD app registration in your tenant), SQL Server execution-plan viewer (SSMS does this better today), code-signing the installer/exe (needs a purchased certificate — until then SmartScreen shows a first-run prompt, see [TROUBLESHOOTING](docs/TROUBLESHOOTING.md)), configurable dashboard widget layout, and per-SKU schema mapping UI for non-canonical warehouses.
+
+> **Packaging now ships:** the PyInstaller spec, portable-zip builder, and a full [Inno Setup installer](installer/finsight.iss) are in the repo. Because PyInstaller can't cross-compile, the actual `.exe`/`Setup.exe` must be built and smoke-tested on a Windows machine — see [docs/INSTALL.md](docs/INSTALL.md).
 
 ## License
 
