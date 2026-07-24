@@ -38,9 +38,7 @@ def create_backup(keep: int = 10) -> Path:
                 continue
             zf.write(path, relative.as_posix())
 
-    archives = sorted(
-        backups_dir().glob("finsight-backup-*.zip"), key=lambda p: p.stat().st_mtime_ns
-    )
+    archives = sorted(backups_dir().glob("finsight-backup-*.zip"), key=_creation_order)
     for old in archives[:-keep] if keep > 0 else []:
         old.unlink(missing_ok=True)
         logger.info("pruned old backup %s", old.name)
@@ -49,10 +47,20 @@ def create_backup(keep: int = 10) -> Path:
     return archive
 
 
+def _creation_order(path: Path) -> tuple[str, int]:
+    """Deterministic creation ordering from the filename itself.
+
+    Names are ``finsight-backup-YYYYmmdd-HHMMSS-mmm[-N].zip``: the
+    fixed-width timestamp sorts chronologically as a string, and the
+    collision counter N breaks ties within the same millisecond —
+    no dependence on filesystem mtime granularity.
+    """
+    parts = path.stem.split("-")
+    if len(parts) == 6 and parts[-1].isdigit():
+        return ("-".join(parts[:5]), int(parts[-1]))
+    return (path.stem, 0)
+
+
 def list_backups() -> list[Path]:
-    """Newest first, ordered by actual creation time."""
-    return sorted(
-        backups_dir().glob("finsight-backup-*.zip"),
-        key=lambda p: p.stat().st_mtime_ns,
-        reverse=True,
-    )
+    """Newest first."""
+    return sorted(backups_dir().glob("finsight-backup-*.zip"), key=_creation_order, reverse=True)
