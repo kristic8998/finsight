@@ -2,6 +2,13 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [1.2.0] — 2026-07-24
+
+### Added
+- **Root Cause Analyzer**: every reconciliation now explains its difference — decomposition into missing/duplicates/amount-mismatch causes with amount impact, share %, and recommended fixes; narrative shown on the Recon page and an Investigation sheet added to the difference workbook
+- **Typo-pair detection**: unmatched keys on both sides are fuzzy-compared (stdlib difflib) to surface likely key-format issues ("UTR-9001" ≈ "UTR9001") with a Possible Typos sheet
+- **Data Quality Score**: Excel profiler now reports a composite 0–100 score (completeness / uniqueness / consistency) with grade and notes
+
 ## [1.1.0] — 2026-07-24
 
 ### Added
