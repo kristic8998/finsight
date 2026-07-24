@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finsight"
+version = "1.0.0"
+description = "Enterprise lending analytics, automation & executive intelligence desktop suite for NBFC/FinTech teams."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Kristi Chakraborty" }]
+keywords = ["lending", "nbfc", "analytics", "mis", "reconciliation", "desktop", "customtkinter"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "customtkinter>=5.2",
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+    "SQLAlchemy>=2.0",
+    "pydantic>=2.6",
+    "PyYAML>=6.0",
+    "openpyxl>=3.1",
+    "keyring>=24.0",
+]
+
+[project.optional-dependencies]
+mssql = ["pyodbc>=5.0"]
+dev = ["pytest>=8.0", "black>=24.1", "ruff>=0.3", "pyinstaller>=6.3"]
+
+[project.scripts]
+finsight = "finsight.selftest:main"
+
+[project.urls]
+Homepage = "https://github.com/kristic8998/finsight"
+Issues = "https://github.com/kristic8998/finsight/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "SIM108",  # explicit if/else reads better in UI code
+    "SIM905",  # long keyword lists as split() strings are more maintainable
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["SIM117"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

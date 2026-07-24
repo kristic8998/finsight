@@ -1,0 +1,11 @@
+# Runtime dependencies. For Azure SQL / MS SQL also: pip install pyodbc
+customtkinter>=5.2
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+matplotlib>=3.8
+SQLAlchemy>=2.0
+pydantic>=2.6
+PyYAML>=6.0
+openpyxl>=3.1
+keyring>=24.0
