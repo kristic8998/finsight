@@ -1,0 +1,30 @@
+# FinSight configuration example.
+# The live file is auto-managed at %LOCALAPPDATA%/FinSight/config.yaml —
+# copy values from here if you prefer editing by hand.
+
+ui:
+  theme: dark            # dark | light
+  start_page: executive  # executive | ask | sql | excel | recon | mis
+
+executive:
+  par_alert_pct: 5.0           # alert when portfolio-at-risk exceeds this
+  efficiency_alert_pct: 90.0   # alert when collection efficiency drops below
+  concentration_alert_pct: 40.0
+
+recon:
+  amount_tolerance: 1.0        # default ± tolerance for amount matching
+
+automation:
+  enabled: false               # start scheduler on launch
+  poll_seconds: 20
+
+email:
+  smtp_host: ""
+  smtp_port: 587
+  use_tls: true
+  sender: ""                   # password lives in the credential vault, not here
+
+demo:
+  seed: 42
+  branches: 8
+  loans: 1200
