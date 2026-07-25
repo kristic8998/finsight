@@ -46,6 +46,20 @@ class EmailConfig(BaseModel):
     # Password is stored via the credential vault, never in YAML.
 
 
+class DataQualityConfig(BaseModel):
+    """Data Quality Center thresholds and streaming limits."""
+
+    chunk_size: int = Field(default=50_000, ge=1_000, le=1_000_000)
+    missing_alert_pct: float = Field(default=20.0, ge=0.0, le=100.0)
+
+
+class ApiConfig(BaseModel):
+    """API Explorer request defaults."""
+
+    timeout_seconds: float = Field(default=30.0, gt=0.0, le=600.0)
+    max_history: int = Field(default=50, ge=1, le=1_000)
+
+
 class BrandingConfig(BaseModel):
     """Company identity stamped onto generated report packs."""
 
@@ -64,6 +78,8 @@ class AppConfig(BaseModel):
     recon: ReconConfig = Field(default_factory=ReconConfig)
     automation: AutomationConfig = Field(default_factory=AutomationConfig)
     email: EmailConfig = Field(default_factory=EmailConfig)
+    data_quality: DataQualityConfig = Field(default_factory=DataQualityConfig)
+    api: ApiConfig = Field(default_factory=ApiConfig)
     branding: BrandingConfig = Field(default_factory=BrandingConfig)
     demo: DemoConfig = Field(default_factory=DemoConfig)
 

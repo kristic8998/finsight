@@ -43,6 +43,13 @@ def backups_dir() -> Path:
     return path
 
 
+def user_plugins_dir() -> Path:
+    """Drop-in folder for user plugins (scanned at startup)."""
+    path = app_data_dir() / "plugins"
+    path.mkdir(exist_ok=True)
+    return path
+
+
 def appdb_path() -> Path:
     return app_data_dir() / "finsight.db"
 
