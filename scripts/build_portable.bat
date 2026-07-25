@@ -7,11 +7,11 @@ rem  unzips it anywhere (USB stick, Desktop, network share) and double-clicks
 rem  FinSight.exe. Python is bundled inside, so the target PC needs no Python.
 rem
 rem  Prereq: run scripts\build_windows.bat first (creates dist\FinSight).
-rem  Output: dist\FinSight-1.3.0-portable.zip
+rem  Output: dist\FinSight-1.4.0-portable.zip
 rem ============================================================================
 setlocal
 cd /d "%~dp0.."
-set "VERSION=1.3.0"
+set "VERSION=1.4.0"
 set "PKG=FinSight-%VERSION%-portable"
 
 if not exist "dist\FinSight\FinSight.exe" (
