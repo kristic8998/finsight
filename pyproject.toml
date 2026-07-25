@@ -66,6 +66,11 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["SIM117"]
 
+[tool.ruff.lint.isort]
+# Make first-party resolution explicit so local runs and CI always agree,
+# regardless of ruff version or how the package is installed.
+known-first-party = ["finsight"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
