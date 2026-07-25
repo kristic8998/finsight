@@ -35,6 +35,7 @@ _PAGES: list[tuple[str, str, str, int]] = [
     ("dq", "Data Quality", "⚑", 45),
     ("recon", "Reconciliation", "⇄", 50),
     ("mis", "MIS Reports", "▣", 60),
+    ("studio", "MIS Studio", "🧩", 65),
     ("analytics", "Analytics", "∿", 70),
     ("automation", "Automation", "⚙", 80),
     ("api", "API Explorer", "⇆", 85),
@@ -259,6 +260,9 @@ class FinSightApp(ctk.CTk):
 
     def _on_close(self) -> None:
         try:
+            auto_reporter = self.context.extras.get("auto_reporter")
+            if auto_reporter is not None:
+                auto_reporter.stop()
             self.context.automation.stop()
             self.context.runner.shutdown()
             self.context.connections.dispose_all()

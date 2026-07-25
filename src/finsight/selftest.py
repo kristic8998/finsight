@@ -144,6 +144,58 @@ def run_selftest() -> int:
 
         checks.append(("plugins", check_plugins))
 
+        def check_mis_builder() -> str:
+            from .modules.mis_builder import BuilderConfig, build_pivot, export_pivot
+            from .modules.mis_samples import sample_lending_dataset
+
+            sample = sample_lending_dataset(200)
+            result = build_pivot(
+                sample, BuilderConfig(group_by="branch", value="loan_amount", aggregate="Sum")
+            )
+            assert str(result.frame.iloc[-1, 0]) == "TOTAL"
+            out = export_pivot(result, tmp_path / "builder.xlsx")
+            assert out.is_file()
+            return f"{len(result.frame) - 1} groups · {result.title}"
+
+        checks.append(("mis builder", check_mis_builder))
+
+        def check_mis_templates() -> str:
+            from .modules.mis_samples import sample_lending_dataset
+            from .modules.mis_templates import TEMPLATES, export_template, run_template
+
+            sample = sample_lending_dataset(200)
+            results = [run_template(key, sample) for key in TEMPLATES]
+            out = export_template(results[0], tmp_path / "template.xlsx")
+            assert out.is_file() and all(r.kpis for r in results)
+            return f"{len(results)} templates OK"
+
+        checks.append(("mis templates", check_mis_templates))
+
+        def check_auto_reporter() -> str:
+            from datetime import datetime
+
+            from .modules.auto_reporter import AutoReporter, ReportJob
+            from .modules.mis_samples import sample_lending_dataset
+
+            source = tmp_path / "auto_source.csv"
+            sample_lending_dataset(120).to_csv(source, index=False)
+            reporter = AutoReporter(store_path=tmp_path / "auto_jobs.json", output_dir=tmp_path)
+            job = reporter.add_job(
+                ReportJob(
+                    name="Selftest Report",
+                    kind="template:portfolio_health",
+                    source_path=str(source),
+                    frequency="Daily",
+                    at="23:59",
+                ),
+                now=datetime(2026, 1, 1, 8, 0),
+            )
+            fired = reporter.run_due_jobs(now=datetime(2026, 1, 2, 0, 0))
+            assert len(fired) == 1 and fired[0].is_file()
+            return f"fired 1 job · next {job.next_run}"
+
+        checks.append(("auto reporter", check_auto_reporter))
+
         print("FinSight self-test")
         print("=" * 60)
         failures = 0
