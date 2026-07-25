@@ -7,10 +7,12 @@ debuggable), so pages never build their own dependencies.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 
 from ..core.appdb import AppDB
 from ..core.config import AppConfig
+from ..core.paths import user_plugins_dir
 from ..core.registry import Registry
 from ..core.tasks import TaskRunner
 from ..data.connections import DEMO_CONNECTION, ConnectionManager
@@ -23,6 +25,8 @@ from ..modules.mis_catalog import MisCatalog
 from ..modules.nlq import NlqEngine
 from ..modules.productivity import ProductivityService
 from ..modules.sql_studio import SqlStudioService
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -55,10 +59,26 @@ class AppContext:
         self.mis_catalog = MisCatalog(self.data, self.appdb, self.config.branding.company_name)
 
 
+def _load_plugins(registry: Registry) -> None:
+    """Discover drop-in plugins; never let a bad plugin break startup."""
+    try:
+        result = registry.load_plugins(user_dir=user_plugins_dir())
+    except Exception as exc:  # noqa: BLE001 - discovery must never crash the app
+        logger.warning("plugin discovery failed: %s", exc)
+        return
+    for source, message in result.errors:
+        logger.warning("plugin skipped (%s): %s", source, message)
+    if result.plugins:
+        logger.info(
+            "loaded %d plugin(s): %s", len(result.plugins), ", ".join(p.id for p in result.plugins)
+        )
+
+
 def build_context(config: AppConfig) -> AppContext:
     """Wire the whole application object graph."""
     appdb = AppDB()
     registry = Registry()
+    _load_plugins(registry)
     runner = TaskRunner(max_workers=4)
     connections = ConnectionManager(appdb)
     data = LendingDataService(connections, DEMO_CONNECTION)
