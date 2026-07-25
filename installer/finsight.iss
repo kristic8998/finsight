@@ -16,7 +16,7 @@
 ; ============================================================================
 
 #define AppName "FinSight"
-#define AppVersion "1.3.0"
+#define AppVersion "1.4.0"
 #define AppPublisher "Kristi Chakraborty"
 #define AppExeName "FinSight.exe"
 #define AppURL "https://github.com/kristic8998/finsight"
