@@ -14,8 +14,8 @@ FinSight is a Windows desktop application (CustomTkinter). It targets **Windows 
 
 | You want to… | Use | Needs Python? | Needs admin? |
 |---|---|---|---|
-| Click through a normal Setup wizard, get Start-menu shortcuts | **Installer** (`FinSight-Setup-1.3.0.exe`) | No | No (per-user) |
-| Run from a USB stick / no install at all | **Portable** (`FinSight-1.3.0-portable.zip`) | No | No |
+| Click through a normal Setup wizard, get Start-menu shortcuts | **Installer** (`FinSight-Setup-1.4.0.exe`) | No | No (per-user) |
+| Run from a USB stick / no install at all | **Portable** (`FinSight-1.4.0-portable.zip`) | No | No |
 | Develop, modify, or build the app | **From source** (`pip install -e .`) | Yes, 3.10+ | No |
 
 Both packaged options bundle their own Python — **the target PC does not need Python installed.**
@@ -24,7 +24,7 @@ Both packaged options bundle their own Python — **the target PC does not need 
 
 ## Option A: Installer (easiest)
 
-1. Download **`FinSight-Setup-1.3.0.exe`** from the [Releases page](https://github.com/kristic8998/finsight/releases).
+1. Download **`FinSight-Setup-1.4.0.exe`** from the [Releases page](https://github.com/kristic8998/finsight/releases).
 2. Double-click it. If Windows SmartScreen shows *"Windows protected your PC"*, click **More info → Run anyway** (this appears because the installer isn't code-signed; it is expected).
 3. Follow the wizard. Default install location is `%LOCALAPPDATA%\Programs\FinSight` — **no administrator rights required**.
 4. Optionally tick **Create a desktop shortcut**.
@@ -36,7 +36,7 @@ To remove it later, see [Uninstalling](#uninstalling).
 
 ## Option B: Portable (zip, no install)
 
-1. Download **`FinSight-1.3.0-portable.zip`** from the [Releases page](https://github.com/kristic8998/finsight/releases).
+1. Download **`FinSight-1.4.0-portable.zip`** from the [Releases page](https://github.com/kristic8998/finsight/releases).
 2. Right-click the zip → **Extract All…** → choose any folder (Desktop, Documents, a USB drive — all fine).
 3. Open the extracted folder and double-click **`Start FinSight.bat`** (or `FinSight\FinSight.exe`).
 4. Same SmartScreen note as above: **More info → Run anyway** the first time.
@@ -49,8 +49,8 @@ Nothing is written to Program Files or the registry. To "uninstall," just delete
 
 **This is the normal case for the installer and the portable zip, and it just works.** PyInstaller bundles a complete Python runtime and every dependency *inside* the distributable. The target machine needs **only Windows 10/11 64-bit** — no Python, no `pip`, no internet connection.
 
-- **Installer:** copy `FinSight-Setup-1.3.0.exe` to the other PC (USB or network share), run it, done.
-- **Portable:** copy `FinSight-1.3.0-portable.zip`, unzip, run `Start FinSight.bat`, done.
+- **Installer:** copy `FinSight-Setup-1.4.0.exe` to the other PC (USB or network share), run it, done.
+- **Portable:** copy `FinSight-1.4.0-portable.zip`, unzip, run `Start FinSight.bat`, done.
 
 You only need Python if you intend to **build** FinSight from source (next sections).
 
@@ -107,7 +107,7 @@ Your prompt now starts with `(.venv)`. Run everything below inside it. To leave 
 
 ## 4. Install dependencies
 
-FinSight's runtime dependencies (declared in `pyproject.toml`) are: `customtkinter`, `numpy`, `pandas`, `scikit-learn`, `matplotlib`, `SQLAlchemy`, `pydantic`, `PyYAML`, `openpyxl`, `keyring`.
+FinSight's runtime dependencies (declared in `pyproject.toml`) are: `customtkinter`, `numpy`, `pandas`, `scikit-learn`, `matplotlib`, `SQLAlchemy`, `pydantic`, `PyYAML`, `openpyxl`, `keyring`, `requests`.
 
 Install the app (this pulls all of them automatically):
 
@@ -178,7 +178,7 @@ After the build above:
 scripts\build_portable.bat
 ```
 
-→ `dist\FinSight-1.3.0-portable.zip` — a self-contained folder with `FinSight.exe`, a `Start FinSight.bat` launcher, and a short read-me. Share that one zip; the recipient unzips and runs it.
+→ `dist\FinSight-1.4.0-portable.zip` — a self-contained folder with `FinSight.exe`, a `Start FinSight.bat` launcher, and a short read-me. Share that one zip; the recipient unzips and runs it.
 
 ### Installer version (Inno Setup)
 
@@ -190,7 +190,7 @@ scripts\build_portable.bat
    "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\finsight.iss
    ```
 
-→ `installer\Output\FinSight-Setup-1.3.0.exe` — a standard wizard installer that creates shortcuts and a registered uninstaller. The full annotated script is in [`installer/finsight.iss`](../installer/finsight.iss).
+→ `installer\Output\FinSight-Setup-1.4.0.exe` — a standard wizard installer that creates shortcuts and a registered uninstaller. The full annotated script is in [`installer/finsight.iss`](../installer/finsight.iss).
 
 ---
 
