@@ -2,6 +2,10 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [1.5.1] — 2026-07-26
+
+Packaging fix: the v1.5.0 tag was cut while the five new MIS Studio engine files were missing from the repository (a failed web upload), so its source snapshot could not import `finsight.modules.mis_builder` and friends. No code changes beyond re-adding those files, pinning ruff's `known-first-party` for CI/local parity, and this version bump. Use this tag instead of v1.5.0.
+
 ## [1.5.0] — 2026-07-25
 
 The "Layman-Friendly MIS Engine" — a new **MIS Studio** page (sidebar, between MIS Reports and Analytics) with three tabs, each carrying a permanent How-to-Use card, friendly error popups instead of crashes, and background-threaded pandas throughout.
