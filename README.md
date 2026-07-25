@@ -22,6 +22,9 @@ Open it and everything already works: FinSight ships a realistic synthetic lendi
 | **MIS Generator** | Daily/weekly/monthly packs: styled Excel workbook + board-ready HTML (print → PDF) |
 | **AI Analytics** | 30-day collections forecast, anomaly detection, customer segmentation, loan risk scores — every result explains its method |
 | **Automation Center** | Scheduled jobs (daily-at / every-N-min), folder watcher (statement lands → recon runs), full audited run log, email delivery |
+| **Data Quality Center** | One-click profiling for Excel/CSV/SQL — duplicates, missing values, IQR outliers, business-rule violations — a 0–100 quality score and an exportable exception workbook. Streams large CSVs in chunks |
+| **API Explorer** | Test REST/JSON payment & CRM services (GET/POST/PUT/PATCH/DELETE): header & param editors, JSON pretty-print, response-time tracking — every call runs off the UI thread |
+| **Plugins** | Drop a `.py` file into the plugins folder and it becomes a sidebar tool at next launch — no core edits. See [docs/PLUGINS.md](docs/PLUGINS.md) |
 | **Productivity** | Notes, kanban task board, pinned favourites |
 | **Platform** | Dark/light themes, **Ctrl+K command palette**, global search, keyboard shortcuts, auto-backup on exit, secure credential vault (Windows Credential Manager) |
 
@@ -40,7 +43,7 @@ Both bundle their own Python, so the target PC needs nothing but Windows 10/11 6
 git clone https://github.com/kristic8998/finsight
 cd finsight
 scripts\install_windows.bat     :: creates .venv and installs everything
-finsight --selftest             :: verifies all 14 subsystems on your machine
+finsight --selftest             :: verifies all 17 subsystems on your machine
 finsight                        :: launches the app
 ```
 
@@ -90,14 +93,15 @@ runs the entire stack headless — demo data, KPIs, brief, NLQ, forecast, anomal
 ```
 finsight/
 ├── src/finsight/
-│   ├── core/        # config, logging, app-state DB, registry, tasks, backup, credentials
+│   ├── core/        # config, logging, app-state DB, registry, tasks, backup, credentials, plugins
 │   ├── data/        # connection manager, demo generator, LendingDataService (all KPI math)
-│   ├── modules/     # executive, nlq, analytics, recon, excel_tools, mis, sql_studio,
-│   │                # automation, productivity — pure services, no UI imports
-│   ├── ui/          # CustomTkinter shell, command palette, widgets, 10 pages
-│   ├── app.py       # composition root + window shell
+│   ├── modules/     # executive, nlq, analytics, recon, excel_tools, mis, sql_studio, automation,
+│   │                # productivity, data_quality, api_explorer — pure services, no UI imports
+│   ├── ui/          # CustomTkinter shell, command palette, widgets, 12 pages
+│   ├── plugins/     # drop-in sidebar extensions (example_toolkit.py) — see docs/PLUGINS.md
+│   ├── app.py       # composition root + window shell (folds plugins into the sidebar)
 │   └── selftest.py  # `finsight --selftest` end-to-end verification
-├── tests/           # 62 tests over every service
+├── tests/           # service tests + Data Quality, API Explorer & plugin-loader coverage
 ├── docs/            # install, user guide, troubleshooting, manual, architecture, dev guide
 ├── sample_data/     # recon + cleaning demo files
 ├── scripts/         # Windows install/run + PyInstaller & portable-zip build scripts
@@ -108,7 +112,8 @@ finsight/
 ## Documentation
 
 - **[Install Guide](docs/INSTALL.md)** — installer & portable, building from source, PyInstaller, Inno Setup installer, installing on a no-Python PC, updating, uninstalling
-- **[User Guide](docs/USER_GUIDE.md)** — get productive fast; the nine areas, shortcuts, connecting your data
+- **[User Guide](docs/USER_GUIDE.md)** — get productive fast; the areas, shortcuts, connecting your data
+- **[Plugins](docs/PLUGINS.md)** — write a drop-in sidebar tool in one file (the plugin contract + a worked example)
 - **[Troubleshooting](docs/TROUBLESHOOTING.md)** — SmartScreen, antivirus, missing DLLs, build issues, logs
 - **[User Manual](docs/USER_MANUAL.md)** — every module, step by step, written for a non-programmer
 - **[Architecture](docs/ARCHITECTURE.md)** — layers, patterns (repository, service, DI), threading model, canonical schema

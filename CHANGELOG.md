@@ -2,6 +2,20 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [1.4.0] — 2026-07-25
+
+Phase 2 expansion — three new architectural components, all non-blocking and lightweight for a 16 GB integrated-graphics laptop.
+
+### Added
+- **Data Quality Center** (`modules/data_quality.py`, `ui/pages/dq_page.py`): one-click profiling for Excel, CSV, and SQL — per-column stats, duplicate rows, duplicate keys, missing/empty/constant columns, negative amounts, IQR outliers, and whitespace issues, rolled into a 0–100 quality score with grade and an exportable three-sheet exception workbook. Large CSVs stream through a chunked accumulator so the same report is produced whether a file is profiled whole or in chunks (asserted by tests).
+- **API Explorer** (`modules/api_explorer.py`, `ui/pages/api_page.py`): a lightweight REST client for testing payment/CRM/JSON services — GET/POST/PUT/PATCH/DELETE, header & param editors, JSON pretty-printing, and response-time tracking. Transport errors become inspectable responses rather than crashes; a capped in-session history is kept. Every call runs on the `TaskRunner`, never on the Tk thread.
+- **Plugin architecture** (`core/plugins.py`, enhanced `core/registry.py`, new `plugins/` package): drop a `.py` file defining a `FinSightPlugin` subclass into `finsight/plugins/` or `%LOCALAPPDATA%/FinSight/plugins/` and it is discovered at startup and mounted in the sidebar — no core edits. Discovery is defensive (a broken plugin is logged and skipped) and the shell folds plugins into the navigation and page router alongside built-in pages. Ships a worked example, `plugins/example_toolkit.py`, and an authoring guide, `docs/PLUGINS.md`.
+
+### Changed
+- `requests>=2.31` added as a runtime dependency (API Explorer).
+- New optional config sections `data_quality` (chunk size, missing-alert threshold) and `api` (timeout, history size); existing `config.yaml` files remain valid.
+- Self-test now covers 17 subsystems (adds data quality, API explorer, plugin discovery). Test suite gains 33 tests across the three new components (`test_data_quality.py`, `test_api_explorer.py`, `test_plugins.py`), all green under ruff + black on Windows and Ubuntu.
+
 ## [1.3.0] — 2026-07-24
 
 Windows distribution & documentation release — nothing changes in the app's behaviour; everything changes in how you install and hand it off.
