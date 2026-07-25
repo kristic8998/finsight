@@ -32,13 +32,40 @@ _PAGES: list[tuple[str, str, str, int]] = [
     ("ask", "Ask FinSight", "✦", 20),
     ("sql", "SQL Studio", "▤", 30),
     ("excel", "Excel Tools", "▦", 40),
+    ("dq", "Data Quality", "⚑", 45),
     ("recon", "Reconciliation", "⇄", 50),
     ("mis", "MIS Reports", "▣", 60),
     ("analytics", "Analytics", "∿", 70),
     ("automation", "Automation", "⚙", 80),
+    ("api", "API Explorer", "⇆", 85),
     ("productivity", "Productivity", "☰", 90),
-    ("settings", "Settings", "✎", 100),
+    ("settings", "Settings", "✎", 900),  # always last; plugins slot in before it
 ]
+
+
+def _resolve_navigation(
+    context: AppContext,
+) -> tuple[list[tuple[str, str, str, int]], dict]:
+    """Merge built-in pages with discovered plugins into one nav + factory map.
+
+    Built-in pages come from ``PAGE_FACTORIES``; each discovered plugin
+    contributes a sidebar entry and a lazy page factory. A plugin whose id
+    collides with a built-in is skipped (built-ins win). The result is
+    sorted by ``order`` so plugins land after the features and before
+    Settings.
+    """
+    from .ui.pages import PAGE_FACTORIES
+
+    nav = list(_PAGES)
+    factories: dict = dict(PAGE_FACTORIES)
+    for plugin in context.registry.plugins.values():
+        if plugin.id in factories:
+            logger.warning("plugin id %r clashes with a built-in page — skipping", plugin.id)
+            continue
+        nav.append((plugin.id, plugin.title, plugin.icon, plugin.order))
+        factories[plugin.id] = lambda parent, app, p=plugin: p.create_page(parent, app)
+    nav.sort(key=lambda item: (item[3], item[1]))
+    return nav, factories
 
 
 class FinSightApp(ctk.CTk):
@@ -48,6 +75,8 @@ class FinSightApp(ctk.CTk):
         super().__init__()
         self.context = context
         config = context.config
+
+        self._nav, self._page_factories = _resolve_navigation(context)
 
         ctk.set_appearance_mode(config.ui.theme)
         ctk.set_default_color_theme("blue")
@@ -84,14 +113,12 @@ class FinSightApp(ctk.CTk):
         self.bind("<Control-k>", lambda _e: self.open_palette())
         self.bind("<Control-K>", lambda _e: self.open_palette())
         self.bind("<Control-d>", lambda _e: self.toggle_theme())
-        for index, (module_id, *_rest) in enumerate(_PAGES[:9], start=1):
+        for index, (module_id, *_rest) in enumerate(self._nav[:9], start=1):
             self.bind(f"<Control-Key-{index % 10}>", lambda _e, m=module_id: self.show_page(m))
 
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         self.show_page(
-            config.ui.start_page
-            if config.ui.start_page in dict((p[0], p) for p in _PAGES)
-            else "executive"
+            config.ui.start_page if config.ui.start_page in self._page_factories else "executive"
         )
 
     # ---- construction -----------------------------------------------------
@@ -117,7 +144,7 @@ class FinSightApp(ctk.CTk):
         self._nav_holder = ctk.CTkScrollableFrame(sidebar, fg_color="transparent")
         self._nav_holder.pack(fill="both", expand=True, padx=6)
 
-        for module_id, title, glyph, _order in _PAGES:
+        for module_id, title, glyph, _order in self._nav:
             button = ctk.CTkButton(
                 self._nav_holder,
                 text=f"  {glyph}  {title}",
@@ -145,7 +172,7 @@ class FinSightApp(ctk.CTk):
 
     def _register_modules(self) -> None:
         registry = self.context.registry
-        for module_id, title, glyph, order in _PAGES:
+        for module_id, title, glyph, order in self._nav:
             registry.register_module(Module(id=module_id, title=title, icon=glyph, order=order))
             registry.register_action(
                 Action(
@@ -186,13 +213,10 @@ class FinSightApp(ctk.CTk):
 
     # ---- page management ----------------------------------------------------
     def _make_page(self, module_id: str) -> ctk.CTkFrame:
-        from .ui.pages import PAGE_FACTORIES
-
-        factory = PAGE_FACTORIES[module_id]
-        return factory(self._host, self)
+        return self._page_factories[module_id](self._host, self)
 
     def show_page(self, module_id: str) -> None:
-        if module_id not in {p[0] for p in _PAGES}:
+        if module_id not in self._page_factories:
             return
         if module_id not in self._pages:
             self._pages[module_id] = self._make_page(module_id)

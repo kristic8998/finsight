@@ -101,6 +101,49 @@ def run_selftest() -> int:
 
         checks.append(("backup", check_backup))
 
+        def check_data_quality() -> str:
+            from .modules.data_quality import profile_frame
+
+            frame = pd.DataFrame(
+                {
+                    "id": [1, 2, 2, 4, 5],
+                    "amount": [100.0, 200.0, 200.0, None, 100000.0],
+                    "name": ["A", "B ", "b", "C", "A"],
+                }
+            )
+            report = profile_frame(frame)
+            return f"score {report.score:.0f}/{report.grade}, {len(report.issues)} issue(s)"
+
+        checks.append(("data quality", check_data_quality))
+
+        def check_api_explorer() -> str:
+            from .modules.api_explorer import ApiExplorer, ApiRequest
+
+            class _FakeResponse:
+                status_code = 200
+                reason = "OK"
+                ok = True
+                headers = {"Content-Type": "application/json"}
+                content = b'{"pong": true}'
+                text = '{"pong": true}'
+
+            class _FakeSession:
+                def request(self, **_kwargs: object) -> _FakeResponse:
+                    return _FakeResponse()
+
+            api = ApiExplorer(session=_FakeSession())
+            response = api.send(ApiRequest(method="GET", url="https://api.test/ping"))
+            return (
+                f"{response.status_code} in {response.elapsed_ms:.0f}ms, {len(api.history)} logged"
+            )
+
+        checks.append(("api explorer", check_api_explorer))
+
+        def check_plugins() -> str:
+            return f"{len(context.registry.plugins)} plugin(s) discovered"
+
+        checks.append(("plugins", check_plugins))
+
         print("FinSight self-test")
         print("=" * 60)
         failures = 0
