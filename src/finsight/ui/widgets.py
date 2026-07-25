@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import tkinter as tk
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from tkinter import ttk
 
 import customtkinter as ctk
@@ -36,6 +36,61 @@ class KpiCard(ctk.CTkFrame):
     def update_value(self, value: str, sub: str = "", color: str | None = None) -> None:
         self._value.configure(text=value, text_color=color if color else None)
         self._sub.configure(text=sub)
+
+
+class HelperCard(ctk.CTkFrame):
+    """Always-visible 'How to use' card with numbered steps (MIS Studio UX)."""
+
+    def __init__(self, master: tk.Misc, title: str, steps: Sequence[str], **kwargs: object) -> None:
+        super().__init__(master, corner_radius=12, border_width=1, border_color=ACCENT, **kwargs)
+        ctk.CTkLabel(
+            self,
+            text=f"ⓘ  {title}",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            text_color=ACCENT,
+        ).pack(anchor="w", padx=14, pady=(10, 2))
+        for number, step in enumerate(steps, start=1):
+            ctk.CTkLabel(
+                self,
+                text=f"{number}.  {step}",
+                font=ctk.CTkFont(size=12),
+                anchor="w",
+                justify="left",
+                wraplength=1000,
+            ).pack(anchor="w", padx=18, pady=1)
+        ctk.CTkLabel(self, text="").pack(pady=(0, 4))  # bottom breathing room
+
+
+class FriendlyDialog(ctk.CTkToplevel):
+    """A friendly modal popup for user-facing problems — never a crash."""
+
+    def __init__(self, parent: tk.Misc, title: str, message: str, kind: str = "error") -> None:
+        super().__init__(parent)
+        self.title(title)
+        self.resizable(False, False)
+        self.transient(parent.winfo_toplevel())
+        icon = {"error": "⚠", "info": "ℹ", "ok": "✔"}.get(kind, "ℹ")
+        color = {"error": ALERT, "info": ACCENT, "ok": GOOD}.get(kind, ACCENT)
+        ctk.CTkLabel(
+            self,
+            text=f"{icon}  {title}",
+            font=ctk.CTkFont(size=15, weight="bold"),
+            text_color=color,
+        ).pack(anchor="w", padx=20, pady=(16, 4))
+        ctk.CTkLabel(
+            self, text=message, font=ctk.CTkFont(size=12), wraplength=420, justify="left"
+        ).pack(anchor="w", padx=20)
+        ctk.CTkButton(self, text="OK, got it", width=110, command=self.destroy).pack(pady=(14, 16))
+        self.update_idletasks()
+        root = parent.winfo_toplevel()
+        x = root.winfo_x() + (root.winfo_width() - self.winfo_width()) // 2
+        y = root.winfo_y() + (root.winfo_height() - self.winfo_height()) // 3
+        self.geometry(f"+{max(x, 0)}+{max(y, 0)}")
+        self.grab_set()
+
+
+def show_friendly_error(parent: tk.Misc, message: str, title: str = "That didn't work") -> None:
+    FriendlyDialog(parent, title, message, kind="error")
 
 
 class Section(ctk.CTkFrame):
@@ -83,9 +138,18 @@ class DataGrid(ctk.CTkFrame):
     def frame(self) -> pd.DataFrame:
         return self._frame
 
+    def selected_index(self) -> int | None:
+        """Positional index (within the shown frame) of the selected row, if any."""
+        selection = self._tree.selection()
+        iids = getattr(self, "_iids", [])
+        if not selection or selection[0] not in iids:
+            return None
+        return iids.index(selection[0])
+
     def show(self, frame: pd.DataFrame, note: str = "") -> None:
         self._frame = frame
         self._tree.delete(*self._tree.get_children())
+        self._iids: list[str] = []
         columns = [str(c) for c in frame.columns]
         self._tree.configure(columns=columns)
         for column in columns:
@@ -93,7 +157,8 @@ class DataGrid(ctk.CTkFrame):
             self._tree.column(column, width=max(90, min(240, 11 * len(column))), anchor="w")
         shown = frame.head(self._page_size)
         for _, row in shown.iterrows():
-            self._tree.insert("", "end", values=[_fmt(v) for v in row.tolist()])
+            iid = self._tree.insert("", "end", values=[_fmt(v) for v in row.tolist()])
+            self._iids.append(iid)
         extra = f" (showing first {self._page_size:,})" if len(frame) > self._page_size else ""
         banner = f"{len(frame):,} row(s) × {len(columns)} column(s){extra}"
         if note:
