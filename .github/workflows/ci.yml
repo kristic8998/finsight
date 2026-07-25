@@ -32,7 +32,7 @@ jobs:
       - name: Black (format check)
         run: black --check src tests
 
-      - name: Pytest (62 service tests)
+      - name: Pytest (service + Data Quality / API / plugin tests)
         run: pytest
 
       - name: End-to-end selftest (headless)
