@@ -22,6 +22,7 @@ Open it and everything already works: FinSight ships a realistic synthetic lendi
 | **MIS Generator** | Daily/weekly/monthly packs: styled Excel workbook + board-ready HTML (print → PDF) |
 | **AI Analytics** | 30-day collections forecast, anomaly detection, customer segmentation, loan risk scores — every result explains its method |
 | **Automation Center** | Scheduled jobs (daily-at / every-N-min), folder watcher (statement lands → recon runs), full audited run log, email delivery |
+| **MIS Studio** | The layman-friendly MIS engine: a zero-code **Visual Builder** (upload → pick Group by/Metric/Aggregate from your file's own headers → pivot + chart + formatted Excel), three **One-Click Lending Templates** (Daily Disbursement, Collection & DPD, Portfolio Health — CEO-ready workbooks from raw LMS exports), and a **Visual Auto-Reporter** that schedules any of them Daily/Weekly/Monthly like an alarm clock |
 | **Data Quality Center** | One-click profiling for Excel/CSV/SQL — duplicates, missing values, IQR outliers, business-rule violations — a 0–100 quality score and an exportable exception workbook. Streams large CSVs in chunks |
 | **API Explorer** | Test REST/JSON payment & CRM services (GET/POST/PUT/PATCH/DELETE): header & param editors, JSON pretty-print, response-time tracking — every call runs off the UI thread |
 | **Plugins** | Drop a `.py` file into the plugins folder and it becomes a sidebar tool at next launch — no core edits. See [docs/PLUGINS.md](docs/PLUGINS.md) |
@@ -32,8 +33,8 @@ Open it and everything already works: FinSight ships a realistic synthetic lendi
 
 Most people want the packaged app, not the source. Grab it from the [Releases page](https://github.com/kristic8998/finsight/releases):
 
-- **Installer** — `FinSight-Setup-1.3.0.exe`: run the wizard, get Start-menu shortcuts, per-user (no admin).
-- **Portable** — `FinSight-1.3.0-portable.zip`: unzip anywhere and run `Start FinSight.bat`.
+- **Installer** — `FinSight-Setup-1.5.0.exe`: run the wizard, get Start-menu shortcuts, per-user (no admin).
+- **Portable** — `FinSight-1.5.0-portable.zip`: unzip anywhere and run `Start FinSight.bat`.
 
 Both bundle their own Python, so the target PC needs nothing but Windows 10/11 64-bit. Full walkthrough — including building the exe, the Inno Setup installer, updating, and uninstalling — is in **[docs/INSTALL.md](docs/INSTALL.md)**.
 
@@ -43,7 +44,7 @@ Both bundle their own Python, so the target PC needs nothing but Windows 10/11 6
 git clone https://github.com/kristic8998/finsight
 cd finsight
 scripts\install_windows.bat     :: creates .venv and installs everything
-finsight --selftest             :: verifies all 17 subsystems on your machine
+finsight --selftest             :: verifies all 20 subsystems on your machine
 finsight                        :: launches the app
 ```
 
@@ -53,8 +54,8 @@ No configuration needed — the demo lending database is generated on first laun
 
 ```bat
 scripts\build_windows.bat        :: PyInstaller one-folder build -> dist\FinSight\
-scripts\build_portable.bat       :: -> dist\FinSight-1.3.0-portable.zip
-:: then compile installer\finsight.iss in Inno Setup -> FinSight-Setup-1.3.0.exe
+scripts\build_portable.bat       :: -> dist\FinSight-1.5.0-portable.zip
+:: then compile installer\finsight.iss in Inno Setup -> FinSight-Setup-1.5.0.exe
 ```
 
 ### Connecting your real database (Azure SQL / MS SQL)

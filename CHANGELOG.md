@@ -2,6 +2,19 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [1.5.0] — 2026-07-25
+
+The "Layman-Friendly MIS Engine" — a new **MIS Studio** page (sidebar, between MIS Reports and Analytics) with three tabs, each carrying a permanent How-to-Use card, friendly error popups instead of crashes, and background-threaded pandas throughout.
+
+### Added
+- **Visual MIS Builder** (`modules/mis_builder.py`, Builder tab): zero-code pivot wizard — upload any CSV/Excel, dropdowns fill with the file's own headers, pick Group by / Metric / Aggregate (Sum, Average, Count, Min, Max) plus an optional Split-by second dimension → instant pivot with a TOTAL row, an embedded matplotlib chart, formatted Excel export, and named "recipes" saved for the Auto-Reporter.
+- **One-Click Lending Templates** (`modules/mis_templates.py`, Templates tab): three giant buttons — *Daily Disbursement MIS*, *Collection & DPD MIS* (DPD buckets, PAR 30/90, collection efficiency), *Portfolio Health Report* (book size, concentration with share %, top 20 exposures). Columns detected by name from raw LMS exports; wrong files raise a plain-English `TemplateError` shown as a friendly popup; exports are CEO-ready multi-sheet workbooks via a shared house style (`modules/excel_style.py`).
+- **Visual Auto-Reporter** (`modules/auto_reporter.py`, Auto-Reporter tab): alarm-clock scheduling — pick a template or saved recipe, a source file, Daily/Weekly/Monthly + time, click *Activate Automation*. Jobs persist to JSON, fire from a daemon loop (stdlib threading, no new dependency), reschedule after success *and* failure, and log to an in-app activity feed. Honest scope stated in the UI: runs while FinSight is open.
+- Shared UX widgets: `HelperCard` (the mandatory 1-2-3 guide) and `FriendlyDialog`/`show_friendly_error`; `DataGrid` gained row selection (used by the jobs list). Deterministic `modules/mis_samples.py` powers every "Try with sample data" button.
+
+### Changed
+- Self-test now covers 20 subsystems (+ mis builder, mis templates, auto reporter). Test suite grows to 155 (+33 for the new engines, including monthly-clamp and failure-reschedule scheduler cases). No new runtime dependencies.
+
 ## [1.4.0] — 2026-07-25
 
 Phase 2 expansion — three new architectural components, all non-blocking and lightweight for a 16 GB integrated-graphics laptop.
