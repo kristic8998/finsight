@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from .analytics_page import AnalyticsPage
+from .api_page import ApiPage
 from .ask_page import AskPage
 from .automation_page import AutomationPage
+from .dq_page import DqPage
 from .excel_page import ExcelPage
 from .executive_page import ExecutivePage
 from .mis_page import MisPage
@@ -18,10 +20,12 @@ PAGE_FACTORIES = {
     "ask": AskPage,
     "sql": SqlPage,
     "excel": ExcelPage,
+    "dq": DqPage,
     "recon": ReconPage,
     "mis": MisPage,
     "analytics": AnalyticsPage,
     "automation": AutomationPage,
+    "api": ApiPage,
     "productivity": ProductivityPage,
     "settings": SettingsPage,
 }
