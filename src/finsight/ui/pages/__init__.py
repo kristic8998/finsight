@@ -10,6 +10,7 @@ from .dq_page import DqPage
 from .excel_page import ExcelPage
 from .executive_page import ExecutivePage
 from .mis_page import MisPage
+from .mis_studio_page import MisStudioPage
 from .productivity_page import ProductivityPage
 from .recon_page import ReconPage
 from .settings_page import SettingsPage
@@ -23,6 +24,7 @@ PAGE_FACTORIES = {
     "dq": DqPage,
     "recon": ReconPage,
     "mis": MisPage,
+    "studio": MisStudioPage,
     "analytics": AnalyticsPage,
     "automation": AutomationPage,
     "api": ApiPage,
