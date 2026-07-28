@@ -50,6 +50,35 @@ finsight                        :: launches the app
 
 No configuration needed — the demo lending database is generated on first launch. Your data lives in `%LOCALAPPDATA%\FinSight` (settings, history, reports, automatic backups).
 
+## Test-drive with realistic mock data (no real data needed)
+
+You don't need a real loan book to see MIS Studio work. The repo ships a
+standalone simulator that fabricates a realistic, edge-case-filled book —
+missing values, negative adjustments, absurd outliers, every DPD bucket edge,
+Bengali names, even a deliberately messy "hostile" CSV.
+
+**Step 1 — generate the data** (from the repo folder; only needs pandas/numpy/openpyxl):
+
+```bat
+python mock_data_simulator.py
+```
+
+This creates a `mock_data\` folder with `lending_book.xlsx`, `lending_book.csv`
+and `lending_book_stress.csv`.
+
+**Step 2 — start the app:**
+
+```bat
+finsight
+```
+
+**Step 3 — use the mock data in the app:**
+
+1. Open **MIS Studio** in the sidebar.
+2. On the **One-Click Templates** tab, pick `mock_data\lending_book.xlsx` and press any of the three giant buttons — a CEO-ready Excel appears.
+3. On the **Report Wizard** tab, upload the same file and build your own pivot in three clicks.
+4. Feeling brave? Upload `lending_book_stress.csv` — messy headers, a blank row, duplicates and text-formatted numbers. The app must cope without a single crash; if it doesn't, that's a bug worth reporting.
+
 ### Build the distributables
 
 ```bat
