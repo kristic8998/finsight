@@ -33,8 +33,8 @@ Open it and everything already works: FinSight ships a realistic synthetic lendi
 
 Most people want the packaged app, not the source. Grab it from the [Releases page](https://github.com/kristic8998/finsight/releases):
 
-- **Installer** — `FinSight-Setup-1.5.0.exe`: run the wizard, get Start-menu shortcuts, per-user (no admin).
-- **Portable** — `FinSight-1.5.0-portable.zip`: unzip anywhere and run `Start FinSight.bat`.
+- **Installer** — `FinSight-Setup-1.6.0.exe`: run the wizard, get Start-menu shortcuts, per-user (no admin).
+- **Portable** — `FinSight-1.6.0-portable.zip`: unzip anywhere and run `Start FinSight.bat`.
 
 Both bundle their own Python, so the target PC needs nothing but Windows 10/11 64-bit. Full walkthrough — including building the exe, the Inno Setup installer, updating, and uninstalling — is in **[docs/INSTALL.md](docs/INSTALL.md)**.
 
@@ -83,8 +83,8 @@ finsight
 
 ```bat
 scripts\build_windows.bat        :: PyInstaller one-folder build -> dist\FinSight\
-scripts\build_portable.bat       :: -> dist\FinSight-1.5.0-portable.zip
-:: then compile installer\finsight.iss in Inno Setup -> FinSight-Setup-1.5.0.exe
+scripts\build_portable.bat       :: -> dist\FinSight-1.6.0-portable.zip
+:: then compile installer\finsight.iss in Inno Setup -> FinSight-Setup-1.6.0.exe
 ```
 
 ### Connecting your real database (Azure SQL / MS SQL)

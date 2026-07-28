@@ -2,6 +2,18 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [1.6.0] — 2026-07-28
+
+MIS Studio accuracy & dynamism upgrade.
+
+### Added
+- `modules/amounts.py` — the app's single robust money/number parser: text amounts (`"Rs 1,20,000.00"`, `"INR 2,500"`, `"₹ 999"`), accounting negatives (`"(2,500.00)"`), banker suffixes (`"1,250.00 Cr"` / `"500 Dr"`) and percents (`"24%"`) all coerce to real numbers, while identifiers (`"LN50021"`) and prose stay out. Previously all of these read as 0 in reports — silent, plausible, wrong.
+- Visual MIS Builder: two new aggregates — **Median** and **Count Distinct** (the wizard dropdown picks them up automatically). TOTAL rows recompute these over the whole dataset (a sum of per-group medians/distincts would be wrong).
+- 22 new tests (`test_amounts.py` + builder/template robustness cases).
+
+### Changed
+- Builder and all three One-Click Templates now coerce metric columns through the shared parser, and ignore fully blank rows (a classic real-export defect) instead of grouping them under "(blank)".
+
 ## [1.5.1] — 2026-07-26
 
 Packaging fix: the v1.5.0 tag was cut while the five new MIS Studio engine files were missing from the repository (a failed web upload), so its source snapshot could not import `finsight.modules.mis_builder` and friends. No code changes beyond re-adding those files, pinning ruff's `known-first-party` for CI/local parity, and this version bump. Use this tag instead of v1.5.0.
