@@ -90,3 +90,27 @@ class TestGeneral:
             out = export_template(run_template(key, df), tmp_path / f"{key}.xlsx")
             sheets = pd.ExcelFile(out).sheet_names
             assert sheets[0] == "Summary" and len(sheets) >= 3
+
+
+class TestTextMoneyAndBlankRows:
+    def test_text_money_amounts_are_totalled(self):
+        df = sample_lending_dataset(50)
+        df["loan_amount"] = df["loan_amount"].map(lambda v: f"Rs {v:,.2f}")
+        result = run_template("daily_disbursement", df)
+        # the Rs-worded text amounts must sum to the same real total
+        clean_total = sample_lending_dataset(50)["loan_amount"].sum()
+        got = result.sheets["By Branch"].iloc[-1]["disbursed"]
+        assert got == pytest.approx(clean_total)
+
+    def test_fully_blank_rows_are_ignored(self):
+        df = sample_lending_dataset(30)
+        blank = pd.DataFrame([{c: pd.NA for c in df.columns}]).astype(object)
+        noisy = pd.concat([df.astype(object), blank], ignore_index=True)
+        result = run_template("portfolio_health", noisy)
+        clean = run_template("portfolio_health", df)
+        assert result.kpis[0] == clean.kpis[0]
+
+    def test_all_blank_file_raises_friendly_error(self):
+        df = pd.DataFrame({"loan_amount": [None, None], "branch": [None, None]})
+        with pytest.raises(TemplateError, match="no data rows"):
+            run_template("daily_disbursement", df)

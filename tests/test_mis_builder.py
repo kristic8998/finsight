@@ -89,6 +89,43 @@ class TestExport:
         assert len(pd.read_csv(out)) == len(result.frame)
 
 
+class TestRobustCoercionAndNewAggregates:
+    def test_text_money_column_sums_correctly(self):
+        df = pd.DataFrame(
+            {
+                "city": ["A", "A", "B"],
+                "amount": ["Rs 1,000.00", "(250)", "INR 2,500"],
+            }
+        )
+        result = build_pivot(df, BuilderConfig("city", "amount", "Sum"))
+        total = result.frame.iloc[-1]
+        assert total[result.frame.columns[0]] == "TOTAL"
+        assert total.iloc[1] == 3250.0  # 1000 - 250 + 2500
+
+    def test_median_total_recomputed_over_whole_dataset(self):
+        df = pd.DataFrame({"city": ["A", "A", "B", "B", "B"], "amount": [10, 20, 30, 40, 500]})
+        result = build_pivot(df, BuilderConfig("city", "amount", "Median"))
+        assert result.frame.iloc[-1, 1] == 30.0  # overall median, not median of medians
+
+    def test_count_distinct_total_is_overall_nunique(self):
+        df = pd.DataFrame(
+            {
+                "city": ["A", "A", "B", "B"],
+                "customer": ["riya", "arjun", "riya", "mou"],
+            }
+        )
+        result = build_pivot(df, BuilderConfig("city", "customer", "Count Distinct"))
+        # per-group: A=2, B=2 -> naive sum 4; correct overall distinct = 3
+        assert result.frame.iloc[-1, 1] == 3.0
+
+    def test_fully_blank_rows_dropped(self):
+        df = pd.DataFrame({"city": ["A", None, "B"], "amount": [10.0, None, 30.0]})
+        result = build_pivot(df, BuilderConfig("city", "amount", "Sum"))
+        groups = result.frame.iloc[:, 0].tolist()
+        assert "(blank)" not in groups
+        assert result.frame.iloc[-1, 1] == 40.0
+
+
 class TestSavedReports:
     def test_roundtrip_update_delete(self, tmp_path):
         store = tmp_path / "store.json"
