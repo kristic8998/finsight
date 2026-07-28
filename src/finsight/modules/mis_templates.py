@@ -19,6 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from .amounts import parse_amount_series
 from .excel_style import write_formatted_sheet
 
 DPD_BUCKETS = ((0, "Current"), (30, "1-30"), (60, "31-60"), (90, "61-90"), (10**9, "90+"))
@@ -91,7 +92,9 @@ def _find(frame: pd.DataFrame, hints: tuple[str, ...]) -> str | None:
 def _num(frame: pd.DataFrame, column: str | None) -> pd.Series:
     if column is None:
         return pd.Series(0.0, index=frame.index)
-    return pd.to_numeric(frame[column], errors="coerce").fillna(0.0)
+    # Robust coercion via the shared parser: text money ("Rs 1,20,000.00"),
+    # accounting negatives and Cr/Dr suffixes all become real numbers.
+    return parse_amount_series(frame[column]).fillna(0.0)
 
 
 def _text(frame: pd.DataFrame, column: str | None, default: str) -> pd.Series:
@@ -316,7 +319,10 @@ def run_template(key: str, frame: pd.DataFrame) -> TemplateResult:
         raise ValueError(f"unknown template: {key}")
     if frame is None or frame.empty:
         raise TemplateError("The uploaded file has no rows — please check the export.")
-    return _RUNNERS[key](frame.copy())
+    cleaned = frame.dropna(how="all")  # real exports carry fully blank rows
+    if cleaned.empty:
+        raise TemplateError("The uploaded file has no data rows — please check the export.")
+    return _RUNNERS[key](cleaned.copy())
 
 
 def export_template(result: TemplateResult, path: str | Path) -> Path:

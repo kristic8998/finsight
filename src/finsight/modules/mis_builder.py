@@ -20,6 +20,7 @@ from pathlib import Path
 import pandas as pd
 
 from ..core.paths import app_data_dir
+from .amounts import parse_amount_series
 from .excel_style import write_formatted_sheet
 
 logger = logging.getLogger(__name__)
@@ -27,10 +28,15 @@ logger = logging.getLogger(__name__)
 AGGREGATES: dict[str, str] = {
     "Sum": "sum",
     "Average": "mean",
+    "Median": "median",
     "Count": "count",
+    "Count Distinct": "nunique",
     "Minimum": "min",
     "Maximum": "max",
 }
+
+# Aggregates that work on the raw values (no numeric coercion needed).
+_RAW_VALUE_AGGS = ("count", "nunique")
 
 NO_SPLIT = "(none)"
 
@@ -81,10 +87,11 @@ def _validate(frame: pd.DataFrame, config: BuilderConfig) -> None:
 def build_pivot(frame: pd.DataFrame, config: BuilderConfig) -> PivotResult:
     """Run the pivot exactly as the wizard describes it."""
     _validate(frame, config)
-    df = frame.copy()
+    df = frame.dropna(how="all").copy()  # real exports carry fully blank rows
     aggfunc = AGGREGATES[config.aggregate]
-    if aggfunc != "count":
-        df[config.value] = pd.to_numeric(df[config.value], errors="coerce")
+    if aggfunc not in _RAW_VALUE_AGGS:
+        # Robust coercion: "Rs 1,20,000.00", "(2,500)", "24%" all become numbers.
+        df[config.value] = parse_amount_series(df[config.value])
     df[config.group_by] = df[config.group_by].fillna("(blank)").astype(str)
 
     if config.split_by:
@@ -108,13 +115,18 @@ def build_pivot(frame: pd.DataFrame, config: BuilderConfig) -> PivotResult:
 
     out = out.sort_values(value_cols[0], ascending=False).reset_index(drop=True)
 
-    # TOTAL row: additive aggregates get a grand total; the rest recompute overall.
+    # TOTAL row: additive aggregates get a grand total; the rest recompute over
+    # the WHOLE dataset (summing per-group medians/distincts would be wrong).
     totals: dict[str, object] = {config.group_by: "TOTAL"}
     for column in value_cols:
         if aggfunc in ("sum", "count"):
             totals[column] = out[column].sum()
         elif aggfunc == "mean":
-            totals[column] = pd.to_numeric(df[config.value], errors="coerce").mean()
+            totals[column] = df[config.value].mean()
+        elif aggfunc == "median":
+            totals[column] = df[config.value].median()
+        elif aggfunc == "nunique":
+            totals[column] = df[config.value].nunique()
         elif aggfunc == "min":
             totals[column] = out[column].min()
         else:
